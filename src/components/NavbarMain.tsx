@@ -1,14 +1,13 @@
 import Logo from './Logo';
+import AuthDropdownMenu from './AuthDropdownMenu';
 
-export default function MainNavbar() {
+export default function NavbarMain() {
   return (
-    <nav className="flex justify-between">
-      <Logo />
-      <ul className="flex justify-between items-center gap-4">
-        <li>Home</li>
-        <li>Short</li>
-        <li>Contact</li>
-      </ul>
+    <nav className="w-full flex justify-between items-center">
+      <div className="h-16 w-16 flex items-center">
+        <Logo />
+      </div>
+      <AuthDropdownMenu />
     </nav>
   );
 }

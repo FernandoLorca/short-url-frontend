@@ -68,7 +68,7 @@ export default function FormShortUrl() {
             type="submit"
             className="w-full"
           >
-            Short
+            Short URL
           </Button>
         </form>
       </Form>
