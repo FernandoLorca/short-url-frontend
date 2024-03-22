@@ -1,4 +1,4 @@
-import MainNavbar from '@/components/MainNavbar';
+import MainNavbar from '@/components/NavbarMain';
 import FormShortUrl from '@/components/FormShortUrl';
 
 export default function Home() {
