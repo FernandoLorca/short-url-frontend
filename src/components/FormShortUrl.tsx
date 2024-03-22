@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -14,9 +13,22 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 
-const formSchema = z.object({
-  url: z.string().min(3).max(100),
-});
+const formSchema = z
+  .object({
+    url: z
+      .string()
+      .min(7, { message: 'Url must contain at least 7 characters' })
+      .max(100),
+  })
+  .refine(
+    data => {
+      return data.url.startsWith('http://') || data.url.startsWith('https://');
+    },
+    {
+      message: 'Url must start with http:// or https://',
+      path: ['url'],
+    }
+  );
 
 export default function FormShortUrl() {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -44,18 +56,20 @@ export default function FormShortUrl() {
                 <FormLabel>Short Url</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="shadcn"
+                    placeholder="Paste your long url here"
                     {...field}
                   />
                 </FormControl>
-                <FormDescription>
-                  This is your public display name.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type="submit">Short</Button>
+          <Button
+            type="submit"
+            className="w-full"
+          >
+            Short
+          </Button>
         </form>
       </Form>
     </div>
