@@ -16,9 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${inter.className} bg-blop-background bg-no-repeat bg-bottom bg- min-h-screen bg-[length:35rem_35rem]`}
-      >
+      <body className={inter.className}>
         <div className="mx-3 mt-3">{children}</div>
       </body>
     </html>
