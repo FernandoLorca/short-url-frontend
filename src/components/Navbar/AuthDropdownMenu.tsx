@@ -4,7 +4,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
 
 export default function AuthDropdownMenu() {
   return (
@@ -13,8 +15,16 @@ export default function AuthDropdownMenu() {
         <FaUser />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem className="cursor-pointer">Sign in</DropdownMenuItem>
-        <DropdownMenuItem className="cursor-pointer">Sign up</DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer">
+          <Link href="/">Home</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-pointer">
+          <Link href="/signin">Sign in</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer">
+          <Link href="/signup">Sign up</Link>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
