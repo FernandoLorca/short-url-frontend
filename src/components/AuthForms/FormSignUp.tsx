@@ -13,6 +13,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
 import {
   Form,
   FormControl,
@@ -64,10 +65,10 @@ export default function FormSignUp() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: 'jue',
-      email: 'jue1@gmail.com',
-      password: 'password',
-      repeatPassword: 'password',
+      username: '',
+      email: '',
+      password: '',
+      repeatPassword: '',
     },
   });
 
@@ -218,12 +219,22 @@ export default function FormSignUp() {
               )}
             />
             <CardFooter className="flex flex-col items-center gap-2 text-sm p-0">
-              <Button
-                className="w-full text-base"
-                type="submit"
-              >
-                Register
-              </Button>
+              {!response.loading ? (
+                <Button
+                  className="w-full text-base"
+                  type="submit"
+                >
+                  Register
+                </Button>
+              ) : (
+                <Button
+                  disabled
+                  className="w-full"
+                >
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait
+                </Button>
+              )}
               <div className="flex flex-col items-center">
                 <Link href="/signup">Sign in</Link>
               </div>
