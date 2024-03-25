@@ -2,6 +2,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,7 +22,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import Link from 'next/link';
+import { IApiResponse } from './types';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -29,6 +32,23 @@ const formSchema = z.object({
 });
 
 export default function FormSignIn() {
+  const [response, setResponse] = useState<IApiResponse>({
+    ok: false,
+    status: 0,
+    message: '',
+    user: null,
+    data: null,
+    loading: false,
+  });
+  const router = useRouter();
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      router.push('/short-url');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -37,8 +57,58 @@ export default function FormSignIn() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  // This function is used to get the user from the API
+  const logUser = async (email: string, password: string) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_IN}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
+      const user = await res.json();
+
+      setResponse(user);
+      if (user.ok) {
+        localStorage.setItem('token', user.user?.token);
+        router.push('/short-url');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // This useEffect is used to set the error message in the form
+  useEffect(() => {
+    if (!response.ok && response.message === 'User not found') {
+      form.setError('email', {
+        type: 'custom',
+        message: response.message,
+      });
+    }
+    if (!response.ok && response.message === 'Incorrect password') {
+      form.setError('password', {
+        type: 'custom',
+        message: response.message,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [response]);
+
+  // This function is used to submit the form
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await logUser(values.email, values.password);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

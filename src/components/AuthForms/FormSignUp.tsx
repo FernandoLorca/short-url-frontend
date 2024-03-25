@@ -2,6 +2,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,15 +22,21 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import Link from 'next/link';
+import { IApiResponse } from './types';
 
 const formSchema = z
   .object({
+    username: z
+      .string()
+      .min(3, { message: 'Username must be at leat 3 characters' })
+      .max(24, { message: 'Username must be at most 24 characters' }),
     email: z.string().email(),
     password: z
       .string()
       .min(6, { message: 'Password must contain at least 6 characters' }),
-    repeatPassword: z.string().min(6),
+    repeatPassword: z
+      .string()
+      .min(6, { message: 'Password must contain at least 6 characters' }),
   })
   .refine(data => data.password === data.repeatPassword, {
     message: 'Passwords do not match',
@@ -35,18 +44,90 @@ const formSchema = z
   });
 
 export default function FormSignUp() {
+  const [response, setResponse] = useState<IApiResponse>({
+    ok: false,
+    status: 0,
+    message: '',
+    user: null,
+    data: null,
+    loading: false,
+  });
+  const router = useRouter();
+
+  useEffect(() => {
+    if (localStorage.getItem('token')) {
+      router.push('/short-url');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: '',
-      password: '',
-      repeatPassword: '',
+      username: 'jue',
+      email: 'jue1@gmail.com',
+      password: 'password',
+      repeatPassword: 'password',
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const registerUser = async (
+    username: string,
+    email: string,
+    password: string,
+    repeatPassword: string
+  ) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_UP}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+            repeatPassword,
+          }),
+        }
+      );
+      const user = await res.json();
+
+      setResponse(user);
+      if (user.ok) {
+        localStorage.setItem('token', user.user?.token);
+        router.push('/short-url');
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  useEffect(() => {
+    if (!response.ok && response.message === 'Email already exists') {
+      form.setError('email', {
+        type: 'custom',
+        message: response.message,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [response]);
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await registerUser(
+        values.username,
+        values.email,
+        values.password,
+        values.repeatPassword
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <Card className="w-[350px]">
       <CardHeader>
@@ -58,6 +139,25 @@ export default function FormSignUp() {
             onSubmit={form.handleSubmit(onSubmit)}
             className="space-y-8"
           >
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <>
+                      <Label htmlFor="username">Username</Label>
+                      <Input
+                        id="username"
+                        placeholder="Your username"
+                        {...field}
+                      />
+                    </>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="email"
