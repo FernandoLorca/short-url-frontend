@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { IApiResponse } from './types';
+import { IApiResponse } from '../types';
 
 const formSchema = z
   .object({
@@ -78,6 +78,10 @@ export default function FormSignUp() {
     password: string,
     repeatPassword: string
   ) => {
+    setResponse({
+      ...response,
+      loading: true,
+    });
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_UP}`,
@@ -103,6 +107,11 @@ export default function FormSignUp() {
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setResponse({
+        ...response,
+        loading: false,
+      });
     }
   };
 
@@ -224,7 +233,7 @@ export default function FormSignUp() {
                   className="w-full text-base"
                   type="submit"
                 >
-                  Register
+                  Sign up
                 </Button>
               ) : (
                 <Button
@@ -236,7 +245,7 @@ export default function FormSignUp() {
                 </Button>
               )}
               <div className="flex flex-col items-center">
-                <Link href="/signup">Sign in</Link>
+                <Link href="/sign-in">Sign in</Link>
               </div>
             </CardFooter>
           </form>

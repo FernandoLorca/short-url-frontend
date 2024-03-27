@@ -23,7 +23,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { IApiResponse } from './types';
+import { IApiResponse } from '../types';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -60,6 +60,10 @@ export default function FormSignIn() {
 
   // This function is used to get the user from the API
   const logUser = async (email: string, password: string) => {
+    setResponse({
+      ...response,
+      loading: true,
+    });
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_IN}`,
@@ -76,13 +80,19 @@ export default function FormSignIn() {
       );
       const user = await res.json();
 
-      setResponse(user);
       if (user.ok) {
         localStorage.setItem('token', user.user?.token);
         router.push('/short-url');
       }
+      setResponse(user);
     } catch (error) {
       console.error(error);
+    } finally {
+      if (response.ok)
+        setResponse({
+          ...response,
+          loading: false,
+        });
     }
   };
 
@@ -168,7 +178,7 @@ export default function FormSignIn() {
                   className="w-full text-base"
                   type="submit"
                 >
-                  Register
+                  Sign in
                 </Button>
               ) : (
                 <Button
@@ -180,7 +190,7 @@ export default function FormSignIn() {
                 </Button>
               )}
               <div className="flex flex-col items-center">
-                <Link href="/signup">Register</Link>
+                <Link href="/sign-up">Sign up</Link>
               </div>
             </CardFooter>
           </form>

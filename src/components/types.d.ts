@@ -2,7 +2,14 @@ interface User {
   id: number;
   username: string;
   email: string;
-  token: string;
+  token: string | undefined;
+}
+
+interface Data {
+  id: number;
+  originalUrl: string;
+  shortUrl: string;
+  customLink: string | null;
 }
 
 export interface IApiResponse {
@@ -10,6 +17,6 @@ export interface IApiResponse {
   status: Number;
   message: string;
   user: User | null;
-  data?: object | null;
+  data?: Data | null;
   loading: boolean;
 }

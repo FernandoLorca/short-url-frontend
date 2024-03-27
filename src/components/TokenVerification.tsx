@@ -1,6 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import FormShortUrl from './FormShortUrl/FormShortUrl';
+import FormShortUrlHome from './FormShortUrl/FormShortUrlHome';
 
 export default function TokenVerification(): JSX.Element {
   const router = useRouter();
@@ -10,5 +10,5 @@ export default function TokenVerification(): JSX.Element {
     router.push('/short-url');
   }
 
-  return <FormShortUrl />;
+  return <FormShortUrlHome />;
 }
