@@ -33,13 +33,13 @@ const formSchema = z.object({
 });
 
 export default function FormSignIn() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<IApiResponse>({
     ok: false,
     status: 0,
     message: '',
     user: null,
     data: null,
-    loading: false,
   });
   const router = useRouter();
 
@@ -60,10 +60,7 @@ export default function FormSignIn() {
 
   // This function is used to get the user from the API
   const logUser = async (email: string, password: string) => {
-    setResponse({
-      ...response,
-      loading: true,
-    });
+    setIsLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_IN}`,
@@ -82,29 +79,43 @@ export default function FormSignIn() {
 
       if (user.ok) {
         localStorage.setItem('token', user.user?.token);
+        setResponse(user);
+        setIsLoading(false);
         router.push('/short-url');
+      } else {
+        setResponse(user);
       }
-      setResponse(user);
     } catch (error) {
       console.error(error);
-    } finally {
-      if (response.ok)
-        setResponse({
-          ...response,
-          loading: false,
-        });
     }
   };
 
   // This useEffect is used to set the error message in the form
   useEffect(() => {
-    if (!response.ok && response.message === 'User not found') {
+    if (
+      !response.ok &&
+      response.status === 400 &&
+      response.message === 'Invalid email'
+    ) {
+      setIsLoading(false);
+      form.setError('email', {
+        type: 'custom',
+        message: response.message,
+      });
+    }
+    if (
+      !response.ok &&
+      response.status === 404 &&
+      response.message === 'User not found'
+    ) {
+      setIsLoading(false);
       form.setError('email', {
         type: 'custom',
         message: response.message,
       });
     }
     if (!response.ok && response.message === 'Incorrect password') {
+      setIsLoading(false);
       form.setError('password', {
         type: 'custom',
         message: response.message,
@@ -173,7 +184,7 @@ export default function FormSignIn() {
               )}
             />
             <CardFooter className="flex flex-col items-center gap-2 text-sm p-0">
-              {!response.loading ? (
+              {!isLoading ? (
                 <Button
                   className="w-full text-base"
                   type="submit"

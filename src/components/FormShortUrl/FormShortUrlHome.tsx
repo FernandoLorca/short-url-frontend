@@ -2,6 +2,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,6 +41,7 @@ const formSchema = z
   );
 
 export default function FormShortUrlHome() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -49,9 +51,36 @@ export default function FormShortUrlHome() {
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
+  const tokenValidation = async (): Promise<void> => {
     const token = localStorage.getItem('token');
-    !token ? router.push('/sign-up') : router.push('/short-url');
+    setIsLoading(true);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_TOKEN_VALIDATION}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const data = await res.json();
+
+      if (data.ok && data.status === 200 && data.message === 'Token is valid') {
+        router.push('/short-url');
+        setIsLoading(false);
+      } else {
+        router.push('/sign-up');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    tokenValidation();
   };
   return (
     <div className="mt-10 flex justify-center">
@@ -85,12 +114,22 @@ export default function FormShortUrlHome() {
                 )}
               />
               <CardFooter className="flex flex-col items-center gap-2 p-0">
-                <Button
-                  className="w-full"
-                  type="submit"
-                >
-                  Short Url
-                </Button>
+                {!isLoading ? (
+                  <Button
+                    className="w-full"
+                    type="submit"
+                  >
+                    Short Url
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="w-full"
+                  >
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Please wait
+                  </Button>
+                )}
               </CardFooter>
             </form>
           </Form>

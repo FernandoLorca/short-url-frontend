@@ -45,13 +45,13 @@ const formSchema = z
   });
 
 export default function FormSignUp() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [response, setResponse] = useState<IApiResponse>({
     ok: false,
     status: 0,
     message: '',
     user: null,
     data: null,
-    loading: false,
   });
   const router = useRouter();
 
@@ -78,10 +78,7 @@ export default function FormSignUp() {
     password: string,
     repeatPassword: string
   ) => {
-    setResponse({
-      ...response,
-      loading: true,
-    });
+    setIsLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_UP}`,
@@ -99,24 +96,38 @@ export default function FormSignUp() {
         }
       );
       const user = await res.json();
-
       setResponse(user);
+
+      if (
+        !user.ok &&
+        user.status === 409 &&
+        user.message === 'Email already exists'
+      ) {
+        setIsLoading(false);
+        form.setError('email', {
+          type: 'custom',
+          message: user.message,
+        });
+
+        return;
+      }
+
       if (user.ok) {
         localStorage.setItem('token', user.user?.token);
         router.push('/short-url');
+        setIsLoading(false);
       }
     } catch (error) {
       console.error(error);
-    } finally {
-      setResponse({
-        ...response,
-        loading: false,
-      });
     }
   };
 
   useEffect(() => {
-    if (!response.ok && response.message === 'Email already exists') {
+    if (
+      !response.ok &&
+      response.status === 409 &&
+      response.message === 'Email already exists'
+    ) {
       form.setError('email', {
         type: 'custom',
         message: response.message,
@@ -228,7 +239,7 @@ export default function FormSignUp() {
               )}
             />
             <CardFooter className="flex flex-col items-center gap-2 text-sm p-0">
-              {!response.loading ? (
+              {!isLoading ? (
                 <Button
                   className="w-full text-base"
                   type="submit"

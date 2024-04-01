@@ -18,5 +18,4 @@ export interface IApiResponse {
   message: string;
   user: User | null;
   data?: Data | null;
-  loading: boolean;
 }
