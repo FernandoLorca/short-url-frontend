@@ -1,5 +1,6 @@
 import Logo from '../Logo';
 import AuthDropdownMenu from './AuthDropdownMenu';
+import USerDropdownMenu from './UserDropdownMenu';
 
 export default function NavbarMain() {
   return (
@@ -8,6 +9,7 @@ export default function NavbarMain() {
         <Logo />
       </div>
       <AuthDropdownMenu />
+      <USerDropdownMenu />
     </nav>
   );
 }

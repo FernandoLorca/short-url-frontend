@@ -38,7 +38,6 @@ export default function FormSignIn() {
   const setIsLoading = loadingStatesStore.useIsLoading(
     state => state.setIsLoading
   );
-  const user = authStatesStore.useProfileStore(state => state.user);
   const setUser = authStatesStore.useProfileStore(state => state.setUser);
   const setToken = authStatesStore.useAuthStore(state => state.setToken);
   const router = useRouter();
