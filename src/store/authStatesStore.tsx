@@ -4,7 +4,9 @@ import { IUserApiResponse } from '@/types';
 
 interface AuthStore {
   token: string | null;
+  isAuth: boolean;
   setToken: (token: string) => void;
+  setIsAuth: (isAuth: boolean) => void;
 }
 
 interface ProfileStore {
@@ -27,7 +29,9 @@ const useAuthStore = create(
   persist<AuthStore>(
     set => ({
       token: null,
+      isAuth: false,
       setToken: token => set(state => ({ token })),
+      setIsAuth: isAuth => set(state => ({ isAuth })),
     }),
     {
       name: 'auth',

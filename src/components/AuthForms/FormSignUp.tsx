@@ -50,6 +50,7 @@ export default function FormSignUp() {
   const setIsLoading = loadingStatesStore.useIsLoading(
     state => state.setIsLoading
   );
+  const setIsAuth = authStatesStore.useAuthStore(state => state.setIsAuth);
   const setUser = authStatesStore.useProfileStore(state => state.setUser);
   const setToken = authStatesStore.useAuthStore(state => state.setToken);
   const router = useRouter();
@@ -75,11 +76,6 @@ export default function FormSignUp() {
         values.password,
         values.repeatPassword
       );
-      setUser(resUser);
-
-      if (resUser.user && resUser.user.token) {
-        setToken(resUser.user.token);
-      }
 
       if (
         !resUser.ok &&
@@ -99,6 +95,13 @@ export default function FormSignUp() {
         resUser.message === 'User created'
       ) {
         router.push('/short-url');
+      }
+
+      setUser(resUser);
+
+      if (resUser.user && resUser.user.token) {
+        setToken(resUser.user.token);
+        setIsAuth(true);
       }
     } catch (error) {
       console.error(error);

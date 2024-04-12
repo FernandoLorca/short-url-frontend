@@ -38,6 +38,7 @@ export default function FormSignIn() {
   const setIsLoading = loadingStatesStore.useIsLoading(
     state => state.setIsLoading
   );
+  const setIsAuth = authStatesStore.useAuthStore(state => state.setIsAuth);
   const setUser = authStatesStore.useProfileStore(state => state.setUser);
   const setToken = authStatesStore.useAuthStore(state => state.setToken);
   const router = useRouter();
@@ -56,7 +57,6 @@ export default function FormSignIn() {
     setIsLoading(true);
     try {
       const resUser = await auth.logUser(values.email, values.password);
-      setUser(resUser);
 
       if (
         !resUser.ok &&
@@ -88,8 +88,11 @@ export default function FormSignIn() {
         });
       }
 
+      setUser(resUser);
+
       if (resUser.user && resUser.user.token) {
         setToken(resUser.user.token);
+        setIsAuth(true);
       }
 
       if (
