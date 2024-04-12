@@ -6,6 +6,7 @@ import { loadingStatesStore } from '@/store/loadingStatesStore';
 import { auth } from '@/api/auth';
 import FormShortUrlUser from '@/components/FormShortUrl/FormShortUrlUser';
 import NavbarMain from '@/components/Navbar/NavbarMain';
+import UrlsList from '@/components/UrlsList/UrlsList';
 
 export default function ShortUrlHome() {
   const isLoading = loadingStatesStore.useIsLoading(state => state.isLoading);
@@ -26,9 +27,11 @@ export default function ShortUrlHome() {
     }
 
     try {
+      console.log(token.state.token);
       const isValidToken = await auth.validateToken(token.state.token);
 
       if (!isValidToken) {
+        localStorage.removeItem('auth');
         router.push('/');
         return;
       }
@@ -56,7 +59,10 @@ export default function ShortUrlHome() {
           <FaSpinner className="animate-spin opacity-30" />
         </div>
       ) : (
-        <FormShortUrlUser />
+        <>
+          <FormShortUrlUser />
+          <UrlsList />
+        </>
       )}
     </div>
   );

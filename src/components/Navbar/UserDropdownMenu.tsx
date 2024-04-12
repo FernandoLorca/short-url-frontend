@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import Link from 'next/link';
 
-export default function AuthDropdownMenu() {
+export default function UserDropdownMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="bg-[#0f172a] max-h-8 text-white px-3 py-5 flex items-center rounded-md">
@@ -20,7 +20,7 @@ export default function AuthDropdownMenu() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer">
-          <Link href="/short-url">Short URL</Link>
+          <Link href="/short-url">URLs</Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -17,5 +17,5 @@ export interface IUserApiResponse {
   status: Number;
   message: string;
   user?: User | null;
-  data?: Data | null;
+  urls?: Data | null;
 }
