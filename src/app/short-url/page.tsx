@@ -27,7 +27,6 @@ export default function ShortUrlHome() {
     }
 
     try {
-      console.log(token.state.token);
       const isValidToken = await auth.validateToken(token.state.token);
 
       if (!isValidToken) {
@@ -59,10 +58,10 @@ export default function ShortUrlHome() {
           <FaSpinner className="animate-spin opacity-30" />
         </div>
       ) : (
-        <>
+        <div className="flex flex-col items-center gap-5">
           <FormShortUrlUser />
           <UrlsList />
-        </>
+        </div>
       )}
     </div>
   );

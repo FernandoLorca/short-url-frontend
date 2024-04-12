@@ -1,6 +1,6 @@
 import { IUserApiResponse } from '@/types';
 
-const getLinks = async (token: string): Promise<IUserApiResponse> => {
+const getLinks = async (token: string | null): Promise<IUserApiResponse> => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_GET_URLS}`,
     {

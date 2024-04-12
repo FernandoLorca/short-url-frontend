@@ -5,10 +5,10 @@ interface User {
   token: string | undefined;
 }
 
-interface Data {
+interface URLs {
   id: number;
-  originalUrl: string;
-  shortUrl: string;
+  original: string;
+  short: string;
   customLink: string | null;
 }
 
@@ -17,5 +17,5 @@ export interface IUserApiResponse {
   status: Number;
   message: string;
   user?: User | null;
-  urls?: Data | null;
+  urls?: URLs[] | null;
 }

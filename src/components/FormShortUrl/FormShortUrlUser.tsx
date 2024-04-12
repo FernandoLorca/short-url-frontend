@@ -2,7 +2,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,7 +20,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { IApiResponse } from '../../types';
 
 const formSchema = z
   .object({
@@ -42,14 +40,6 @@ const formSchema = z
   );
 
 export default function FormShortUrlUser() {
-  const [response, setResponse] = useState<IApiResponse>({
-    ok: false,
-    status: 0,
-    message: '',
-    user: null,
-    data: null,
-    loading: false,
-  });
   const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,52 +50,48 @@ export default function FormShortUrlUser() {
     },
   });
 
-  const shortUrl = async (
-    url: string,
-    customLink: string | undefined | null
-  ) => {
-    if (customLink === '') {
-      customLink = null;
-    }
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SHORT_URL}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-          body: JSON.stringify({ url, customLink }),
-        }
-      );
-      const data = await res.json();
+  // const shortUrl = async (
+  //   url: string,
+  //   customLink: string | undefined | null
+  // ) => {
+  //   if (customLink === '') {
+  //     customLink = null;
+  //   }
+  //   try {
+  //     const res = await fetch(
+  //       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SHORT_URL}`,
+  //       {
+  //         method: 'POST',
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           Authorization: `Bearer ${localStorage.getItem('token')}`,
+  //         },
+  //         body: JSON.stringify({ url, customLink }),
+  //       }
+  //     );
+  //     const data = await res.json();
 
-      setResponse(data);
+  //     // setResponse(data);
 
-      if (
-        !response.ok &&
-        response.status === 401 &&
-        response.message === 'Token expired'
-      ) {
-        localStorage.removeItem('token');
-        router.push('/');
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  //     if (!user.ok && user.status === 401 && user.message === 'Token expired') {
+  //       localStorage.removeItem('token');
+  //       router.push('/');
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await shortUrl(values.url, values.customLink);
+      // await shortUrl(values.url, values.customLink);
     } catch (error) {
       console.error(error);
     }
   };
 
   return (
-    <div className="mt-10 flex justify-center">
+    <div className="mt-10">
       <Card className="w-[550px]">
         <CardHeader>
           <CardTitle>Shorten your URL</CardTitle>
