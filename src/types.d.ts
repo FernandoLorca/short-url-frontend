@@ -12,10 +12,10 @@ interface Data {
   customLink: string | null;
 }
 
-export interface IApiResponse {
+export interface IUserApiResponse {
   ok: boolean;
   status: Number;
   message: string;
-  user: User | null;
+  user?: User | null;
   data?: Data | null;
 }

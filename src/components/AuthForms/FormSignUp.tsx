@@ -3,8 +3,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { loadingStatesStore } from '@/store/loadingStatesStore';
+import { authStatesStore } from '@/store/authStatesStore';
+import { auth } from '@/api/auth';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -23,7 +25,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { IApiResponse } from '../types';
 
 const formSchema = z
   .object({
@@ -45,22 +46,14 @@ const formSchema = z
   });
 
 export default function FormSignUp() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<IApiResponse>({
-    ok: false,
-    status: 0,
-    message: '',
-    user: null,
-    data: null,
-  });
+  const isLoading = loadingStatesStore.useIsLoading(state => state.isLoading);
+  const setIsLoading = loadingStatesStore.useIsLoading(
+    state => state.setIsLoading
+  );
+  const user = authStatesStore.useProfileStore(state => state.user);
+  const setUser = authStatesStore.useProfileStore(state => state.setUser);
+  const setToken = authStatesStore.useAuthStore(state => state.setToken);
   const router = useRouter();
-
-  useEffect(() => {
-    if (localStorage.getItem('token')) {
-      router.push('/short-url');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -72,78 +65,42 @@ export default function FormSignUp() {
     },
   });
 
-  const registerUser = async (
-    username: string,
-    email: string,
-    password: string,
-    repeatPassword: string
-  ) => {
+  const onSubmit = async (
+    values: z.infer<typeof formSchema>
+  ): Promise<void> => {
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_UP}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username,
-            email,
-            password,
-            repeatPassword,
-          }),
-        }
-      );
-      const user = await res.json();
-      setResponse(user);
-
-      if (
-        !user.ok &&
-        user.status === 409 &&
-        user.message === 'Email already exists'
-      ) {
-        setIsLoading(false);
-        form.setError('email', {
-          type: 'custom',
-          message: user.message,
-        });
-
-        return;
-      }
-
-      if (user.ok) {
-        localStorage.setItem('token', user.user?.token);
-        router.push('/short-url');
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    if (
-      !response.ok &&
-      response.status === 409 &&
-      response.message === 'Email already exists'
-    ) {
-      form.setError('email', {
-        type: 'custom',
-        message: response.message,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [response]);
-
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      await registerUser(
+      const resUser = await auth.registerUser(
         values.username,
         values.email,
         values.password,
         values.repeatPassword
       );
+      setUser(resUser);
+
+      if (resUser.user && resUser.user.token) {
+        setToken(resUser.user.token);
+      }
+
+      if (
+        !resUser.ok &&
+        resUser.status === 409 &&
+        resUser.message === 'Email already exists'
+      ) {
+        form.setError('email', {
+          type: 'custom',
+          message: resUser.message,
+        });
+        setIsLoading(false);
+      }
+
+      if (
+        resUser.ok &&
+        resUser.status === 201 &&
+        resUser.message === 'User created'
+      ) {
+        router.push('/short-url');
+      }
     } catch (error) {
       console.error(error);
     }

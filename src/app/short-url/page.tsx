@@ -1,35 +1,39 @@
 'use client';
 import { FaSpinner } from 'react-icons/fa';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { loadingStatesStore } from '@/store/loadingStatesStore';
+import { auth } from '@/api/auth';
 import FormShortUrlUser from '@/components/FormShortUrl/FormShortUrlUser';
 import NavbarMain from '@/components/Navbar/NavbarMain';
 
 export default function ShortUrlHome() {
-  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+  const isLoading = loadingStatesStore.useIsLoading(state => state.isLoading);
+  const setIsLoading = loadingStatesStore.useIsLoading(
+    state => state.setIsLoading
+  );
+  const getTokenFromLocalStorage = localStorage.getItem('auth');
+  const token =
+    getTokenFromLocalStorage && JSON.parse(getTokenFromLocalStorage);
   const router = useRouter();
-  const token = localStorage.getItem('token');
 
-  const tokenValidation = async (): Promise<void> => {
-    setIsProcessing(true);
+  const tokenValidation = async () => {
+    setIsLoading(true);
+
+    if (token === null) {
+      router.push('/');
+      return;
+    }
+
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_TOKEN_VALIDATION}`,
-        {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const data = await res.json();
+      const isValidToken = await auth.validateToken(token.state.token);
 
-      if (data.ok && data.status === 200 && data.message === 'Token is valid') {
-        setIsProcessing(false);
-      } else {
+      if (!isValidToken) {
         router.push('/');
+        return;
       }
+
+      setIsLoading(false);
     } catch (error) {
       console.error(error);
     }
@@ -47,7 +51,7 @@ export default function ShortUrlHome() {
           <NavbarMain />
         </div>
       </div>
-      {isProcessing ? (
+      {isLoading ? (
         <div className="h-[330px] text-4xl flex justify-center items-center">
           <FaSpinner className="animate-spin opacity-30" />
         </div>

@@ -3,7 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { authStatesStore } from '@/store/authStatesStore';
+import { loadingStatesStore } from '@/store/loadingStatesStore';
+import { auth } from '@/api/auth';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,7 +25,6 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { IApiResponse } from '../types';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -33,22 +34,14 @@ const formSchema = z.object({
 });
 
 export default function FormSignIn() {
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [response, setResponse] = useState<IApiResponse>({
-    ok: false,
-    status: 0,
-    message: '',
-    user: null,
-    data: null,
-  });
+  const isLoading = loadingStatesStore.useIsLoading(state => state.isLoading);
+  const setIsLoading = loadingStatesStore.useIsLoading(
+    state => state.setIsLoading
+  );
+  const user = authStatesStore.useProfileStore(state => state.user);
+  const setUser = authStatesStore.useProfileStore(state => state.setUser);
+  const setToken = authStatesStore.useAuthStore(state => state.setToken);
   const router = useRouter();
-
-  useEffect(() => {
-    if (localStorage.getItem('token')) {
-      router.push('/short-url');
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,76 +51,55 @@ export default function FormSignIn() {
     },
   });
 
-  // This function is used to get the user from the API
-  const logUser = async (email: string, password: string) => {
+  const onSubmit = async (
+    values: z.infer<typeof formSchema>
+  ): Promise<void> => {
     setIsLoading(true);
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_IN}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
-      const user = await res.json();
+      const resUser = await auth.logUser(values.email, values.password);
+      setUser(resUser);
 
-      if (user.ok) {
-        localStorage.setItem('token', user.user?.token);
-        setResponse(user);
+      if (
+        !resUser.ok &&
+        resUser.status === 400 &&
+        resUser.message === 'Invalid email'
+      ) {
         setIsLoading(false);
-        router.push('/short-url');
-      } else {
-        setResponse(user);
+        form.setError('email', {
+          type: 'custom',
+          message: resUser.message,
+        });
       }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+      if (
+        !resUser.ok &&
+        resUser.status === 404 &&
+        resUser.message === 'User not found'
+      ) {
+        setIsLoading(false);
+        form.setError('email', {
+          type: 'custom',
+          message: resUser.message,
+        });
+      }
+      if (!resUser.ok && resUser.message === 'Incorrect password') {
+        setIsLoading(false);
+        form.setError('password', {
+          type: 'custom',
+          message: resUser.message,
+        });
+      }
 
-  // This useEffect is used to set the error message in the form
-  useEffect(() => {
-    if (
-      !response.ok &&
-      response.status === 400 &&
-      response.message === 'Invalid email'
-    ) {
-      setIsLoading(false);
-      form.setError('email', {
-        type: 'custom',
-        message: response.message,
-      });
-    }
-    if (
-      !response.ok &&
-      response.status === 404 &&
-      response.message === 'User not found'
-    ) {
-      setIsLoading(false);
-      form.setError('email', {
-        type: 'custom',
-        message: response.message,
-      });
-    }
-    if (!response.ok && response.message === 'Incorrect password') {
-      setIsLoading(false);
-      form.setError('password', {
-        type: 'custom',
-        message: response.message,
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [response]);
+      if (resUser.user && resUser.user.token) {
+        setToken(resUser.user.token);
+      }
 
-  // This function is used to submit the form
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      await logUser(values.email, values.password);
+      if (
+        resUser.ok &&
+        resUser.status === 200 &&
+        resUser.message === 'User found'
+      ) {
+        router.push('/short-url');
+      }
     } catch (error) {
       console.error(error);
     }
