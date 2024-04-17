@@ -1,4 +1,4 @@
-import { IUserApiResponse } from '@/types';
+import { IApiResponses } from '@/types';
 
 const validateToken = async (token: string | null): Promise<boolean> => {
   const res = await fetch(
@@ -25,7 +25,7 @@ const registerUser = async (
   email: string,
   password: string,
   repeatPassword: string
-): Promise<IUserApiResponse> => {
+): Promise<IApiResponses> => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_UP}`,
@@ -58,7 +58,7 @@ const registerUser = async (
 const logUser = async (
   email: string,
   password: string
-): Promise<IUserApiResponse> => {
+): Promise<IApiResponses> => {
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SIGN_IN}`,

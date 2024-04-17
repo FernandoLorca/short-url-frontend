@@ -1,6 +1,6 @@
-import { IUserApiResponse } from '@/types';
+import { IApiResponses } from '@/types';
 
-const getLinks = async (token: string | null): Promise<IUserApiResponse> => {
+const getUrls = async (token: string | null): Promise<IApiResponses> => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_GET_URLS}`,
     {
@@ -16,4 +16,4 @@ const getLinks = async (token: string | null): Promise<IUserApiResponse> => {
   return data;
 };
 
-export const urls = { getLinks };
+export const urls = { getUrls };

@@ -2,6 +2,7 @@
 import { FaSpinner } from 'react-icons/fa';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { authStatesStore } from '@/store/authStatesStore';
 import { loadingStatesStore } from '@/store/loadingStatesStore';
 import { auth } from '@/api/auth';
 import FormShortUrlUser from '@/components/FormShortUrl/FormShortUrlUser';
@@ -9,28 +10,33 @@ import NavbarMain from '@/components/Navbar/NavbarMain';
 import UrlsList from '@/components/UrlsList/UrlsList';
 
 export default function ShortUrlHome() {
+  const router = useRouter();
   const isLoading = loadingStatesStore.useIsLoading(state => state.isLoading);
   const setIsLoading = loadingStatesStore.useIsLoading(
     state => state.setIsLoading
   );
-  const getTokenFromLocalStorage = localStorage.getItem('auth');
-  const token =
-    getTokenFromLocalStorage && JSON.parse(getTokenFromLocalStorage);
-  const router = useRouter();
+
+  let token: string | null = null;
+  if (typeof window !== 'undefined') {
+    const getTokenFromLocalStorage = localStorage.getItem('auth');
+    const tokenPargeFromLocalStorage =
+      getTokenFromLocalStorage && JSON.parse(getTokenFromLocalStorage);
+    token = tokenPargeFromLocalStorage.state.token;
+  }
 
   const tokenValidation = async () => {
     setIsLoading(true);
 
     if (token === null) {
       router.push('/');
+      setIsLoading(false);
       return;
     }
 
     try {
-      const isValidToken = await auth.validateToken(token.state.token);
+      const isValidToken = await auth.validateToken(token);
 
       if (!isValidToken) {
-        localStorage.removeItem('auth');
         router.push('/');
         return;
       }

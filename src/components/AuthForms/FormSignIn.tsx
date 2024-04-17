@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { authStatesStore } from '@/store/authStatesStore';
+import { userUrlsStatesStore } from '@/store/userUrlsStatesStore';
 import { loadingStatesStore } from '@/store/loadingStatesStore';
 import { auth } from '@/api/auth';
 import { useRouter } from 'next/navigation';
@@ -34,14 +35,16 @@ const formSchema = z.object({
 });
 
 export default function FormSignIn() {
+  const router = useRouter();
   const isLoading = loadingStatesStore.useIsLoading(state => state.isLoading);
   const setIsLoading = loadingStatesStore.useIsLoading(
     state => state.setIsLoading
   );
   const setIsAuth = authStatesStore.useAuthStore(state => state.setIsAuth);
-  const setUser = authStatesStore.useProfileStore(state => state.setUser);
+  const setUser = userUrlsStatesStore.useUserUrlsStateStore(
+    state => state.setUser
+  );
   const setToken = authStatesStore.useAuthStore(state => state.setToken);
-  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -88,7 +91,9 @@ export default function FormSignIn() {
         });
       }
 
-      setUser(resUser);
+      if (resUser.user) {
+        setUser(resUser.user);
+      }
 
       if (resUser.user && resUser.user.token) {
         setToken(resUser.user.token);
@@ -100,6 +105,7 @@ export default function FormSignIn() {
         resUser.status === 200 &&
         resUser.message === 'User found'
       ) {
+        setIsLoading(false);
         router.push('/short-url');
       }
     } catch (error) {

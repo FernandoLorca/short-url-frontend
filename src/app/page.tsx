@@ -9,7 +9,7 @@ import FormShortUrlHome from '@/components/FormShortUrl/FormShortUrlHome';
 import NavbarMain from '@/components/Navbar/NavbarMain';
 
 export default function Home() {
-  authStatesStore.useProfileStore(state => state.user);
+  authStatesStore.useAuthStore(state => state.token);
   const isLoading = loadingStatesStore.useIsLoading(state => state.isLoading);
   const setIsLoading = loadingStatesStore.useIsLoading(
     state => state.setIsLoading

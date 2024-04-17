@@ -1,21 +1,21 @@
-interface User {
+export interface User {
   id: number;
   username: string;
   email: string;
-  token: string | undefined;
+  token: string | null;
 }
 
-interface URLs {
+export interface Url {
   id: number;
   original: string;
   short: string;
   customLink: string | null;
 }
 
-export interface IUserApiResponse {
+export interface IApiResponses {
   ok: boolean;
-  status: Number;
+  status: number;
   message: string;
-  user?: User | null;
-  urls?: URLs[] | null;
+  user?: User;
+  urls?: Url[];
 }

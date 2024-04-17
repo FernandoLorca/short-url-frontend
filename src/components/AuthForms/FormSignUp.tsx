@@ -4,8 +4,9 @@ import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { loadingStatesStore } from '@/store/loadingStatesStore';
 import { authStatesStore } from '@/store/authStatesStore';
+import { userUrlsStatesStore } from '@/store/userUrlsStatesStore';
+import { loadingStatesStore } from '@/store/loadingStatesStore';
 import { auth } from '@/api/auth';
 import { Button } from '@/components/ui/button';
 import {
@@ -51,7 +52,9 @@ export default function FormSignUp() {
     state => state.setIsLoading
   );
   const setIsAuth = authStatesStore.useAuthStore(state => state.setIsAuth);
-  const setUser = authStatesStore.useProfileStore(state => state.setUser);
+  const setUser = userUrlsStatesStore.useUserUrlsStateStore(
+    state => state.setUser
+  );
   const setToken = authStatesStore.useAuthStore(state => state.setToken);
   const router = useRouter();
 
@@ -94,10 +97,13 @@ export default function FormSignUp() {
         resUser.status === 201 &&
         resUser.message === 'User created'
       ) {
+        setIsLoading(false);
         router.push('/short-url');
       }
 
-      setUser(resUser);
+      if (resUser.user) {
+        setUser(resUser.user);
+      }
 
       if (resUser.user && resUser.user.token) {
         setToken(resUser.user.token);
