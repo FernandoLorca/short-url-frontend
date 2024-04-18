@@ -1,4 +1,5 @@
 import { FaUser } from 'react-icons/fa';
+import { authStatesStore } from '@/store/authStatesStore';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +10,9 @@ import {
 import Link from 'next/link';
 
 export default function UserDropdownMenu() {
+  const setToken = authStatesStore.useAuthStore(state => state.setToken);
+  const setIsAuth = authStatesStore.useAuthStore(state => state.setIsAuth);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className="bg-[#0f172a] max-h-8 text-white px-3 py-5 flex items-center rounded-md">
@@ -18,9 +22,20 @@ export default function UserDropdownMenu() {
         <DropdownMenuItem>
           <Link href="/short-url">Profile</Link>
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer">
           <Link href="/short-url">URLs</Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem className="cursor-pointer">
+          <Link
+            href="/"
+            onClick={() => {
+              setToken(null);
+              setIsAuth(false);
+            }}
+          >
+            Log out
+          </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

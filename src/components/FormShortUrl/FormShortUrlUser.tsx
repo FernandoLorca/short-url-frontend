@@ -1,54 +1,14 @@
 'use client';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
+import { IoIosRemove } from 'react-icons/io';
+import { LuMaximize } from 'react-icons/lu';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-
-const formSchema = z
-  .object({
-    url: z
-      .string()
-      .min(7, { message: 'Url must contain at least 7 characters' })
-      .max(100),
-    customLink: z.string().optional(),
-  })
-  .refine(
-    data => {
-      return data.url.startsWith('http://') || data.url.startsWith('https://');
-    },
-    {
-      message: 'Url must start with http:// or https://',
-      path: ['url'],
-    }
-  );
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import FormShortUrlUserCardContent from './FormShortUrlUserCardContent';
 
 export default function FormShortUrlUser() {
+  const [isMinimize, setIsMinimize] = useState<boolean>(false);
   const router = useRouter();
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      url: '',
-      customLink: '',
-    },
-  });
 
   // const shortUrl = async (
   //   url: string,
@@ -82,77 +42,32 @@ export default function FormShortUrlUser() {
   //   }
   // };
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    try {
-      // await shortUrl(values.url, values.customLink);
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   return (
     <div className="mt-10">
       <Card className="w-[550px]">
         <CardHeader>
-          <CardTitle>Shorten your URL</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-8"
-            >
-              <FormField
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <>
-                        <Label htmlFor="url">Paste your long url here</Label>
-                        <Input
-                          id="url"
-                          placeholder="https://long-url.com"
-                          {...field}
-                        />
-                      </>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="customLink"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <>
-                        <Label htmlFor="customLink">
-                          Custom link (optional)
-                        </Label>
-                        <Input
-                          id="customLink"
-                          placeholder="https://short-url.com/custom-name"
-                          {...field}
-                        />
-                      </>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <CardFooter className="flex flex-col items-center gap-2 p-0">
-                <Button
-                  className="w-full"
-                  type="submit"
+          <div className="flex justify-between items-center">
+            <CardTitle>Shorten your URL</CardTitle>
+            <div className="flex gap-2">
+              {!isMinimize ? (
+                <div
+                  className="cursor-pointer hover:opacity-75 text-xl"
+                  onClick={() => setIsMinimize(true)}
                 >
-                  Short Url
-                </Button>
-              </CardFooter>
-            </form>
-          </Form>
-        </CardContent>
+                  <IoIosRemove />
+                </div>
+              ) : (
+                <div
+                  className="cursor-pointer hover:opacity-75 text-xl"
+                  onClick={() => setIsMinimize(false)}
+                >
+                  <LuMaximize />
+                </div>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        {!isMinimize ? <FormShortUrlUserCardContent /> : ''}
       </Card>
     </div>
   );

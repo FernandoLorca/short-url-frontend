@@ -1,3 +1,5 @@
+import { MdModeEdit } from 'react-icons/md';
+import { BiTrashAlt } from 'react-icons/bi';
 import Link from 'next/link';
 import { userUrlsStatesStore } from '@/store/userUrlsStatesStore';
 import { Separator } from '@/components/ui/separator';
@@ -12,7 +14,6 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
     urlShort: string | null,
     customLink: string | null
   ): string => {
-    console.log(urlShort);
     const url = urlShort?.slice(0, -10);
     return `${url}${customLink}`;
   };
@@ -24,26 +25,42 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
   };
 
   return (
-    <div>
+    <>
       <div className="flex flex-col break-all">
-        <p className="text-2xl pb-2">🔗</p>
-        <h4 className="text-xl font-bold pb-2">{url.customLink}</h4>
-        <Link
-          href={url.original}
-          target="_blank"
-          className="hover:underline font-bold text-sky-400"
-        >
-          {url.customLink === null
-            ? url.short
-            : customLinkReplace(url.short, url.customLink)}
-        </Link>
-        <Link
-          href={url.original}
-          target="_blank"
-          className="hover:underline text-sky-700"
-        >
-          {url.original}
-        </Link>
+        <div className="flex justify-between">
+          <h4 className="text-xl font-bold pb-2">
+            <span className="text-lg">🔗 </span>
+            {url.customLink}
+          </h4>
+          <div className="flex gap-2">
+            <div className="cursor-pointer hover:opacity-75">
+              <MdModeEdit />
+            </div>
+            <div className="cursor-pointer hover:opacity-75">
+              <BiTrashAlt />
+            </div>
+          </div>
+        </div>
+        <div className="inline-block">
+          <Link
+            href={url.original}
+            target="_blank"
+            className="hover:underline font-bold text-sky-400"
+          >
+            {url.customLink === null
+              ? url.short
+              : customLinkReplace(url.short, url.customLink)}
+          </Link>
+        </div>
+        <div className="inline-block">
+          <Link
+            href={url.original}
+            target="_blank"
+            className="hover:underline text-sky-700"
+          >
+            {url.original}
+          </Link>
+        </div>
       </div>
       {lastUrlForSeparator(index) ? (
         ''
@@ -52,6 +69,6 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
           <Separator />
         </div>
       )}
-    </div>
+    </>
   );
 }

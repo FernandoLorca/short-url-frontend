@@ -4,7 +4,7 @@ import { persist } from 'zustand/middleware';
 interface AuthStore {
   token: string | null;
   isAuth: boolean;
-  setToken: (token: string) => void;
+  setToken: (token: string | null) => void;
   setIsAuth: (isAuth: boolean) => void;
 }
 

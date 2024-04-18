@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { authStatesStore } from '@/store/authStatesStore';
 import { loadingStatesStore } from '@/store/loadingStatesStore';
 import { auth } from '@/api/auth';
+import { Loader2 } from 'lucide-react';
 import FormShortUrlHome from '@/components/FormShortUrl/FormShortUrlHome';
 import NavbarMain from '@/components/Navbar/NavbarMain';
 
@@ -49,7 +50,7 @@ export default function Home() {
       </div>
       {isLoading ? (
         <div className="h-[330px] text-4xl flex justify-center items-center">
-          <FaSpinner className="animate-spin opacity-30" />
+          <Loader2 className="h-6 w-6 animate-spin" />
         </div>
       ) : (
         <FormShortUrlHome />

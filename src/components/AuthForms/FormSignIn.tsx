@@ -105,7 +105,6 @@ export default function FormSignIn() {
         resUser.status === 200 &&
         resUser.message === 'User found'
       ) {
-        setIsLoading(false);
         router.push('/short-url');
       }
     } catch (error) {

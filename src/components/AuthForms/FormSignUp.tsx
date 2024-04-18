@@ -97,7 +97,6 @@ export default function FormSignUp() {
         resUser.status === 201 &&
         resUser.message === 'User created'
       ) {
-        setIsLoading(false);
         router.push('/short-url');
       }
 

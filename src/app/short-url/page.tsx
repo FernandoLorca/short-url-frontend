@@ -1,20 +1,16 @@
 'use client';
-import { FaSpinner } from 'react-icons/fa';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { authStatesStore } from '@/store/authStatesStore';
 import { loadingStatesStore } from '@/store/loadingStatesStore';
 import { auth } from '@/api/auth';
+import { Loader2 } from 'lucide-react';
 import FormShortUrlUser from '@/components/FormShortUrl/FormShortUrlUser';
 import NavbarMain from '@/components/Navbar/NavbarMain';
 import UrlsList from '@/components/UrlsList/UrlsList';
 
 export default function ShortUrlHome() {
   const router = useRouter();
-  const isLoading = loadingStatesStore.useIsLoading(state => state.isLoading);
-  const setIsLoading = loadingStatesStore.useIsLoading(
-    state => state.setIsLoading
-  );
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   let token: string | null = null;
   if (typeof window !== 'undefined') {
@@ -25,11 +21,8 @@ export default function ShortUrlHome() {
   }
 
   const tokenValidation = async () => {
-    setIsLoading(true);
-
     if (token === null) {
       router.push('/');
-      setIsLoading(false);
       return;
     }
 
@@ -53,7 +46,7 @@ export default function ShortUrlHome() {
   }, []);
 
   return (
-    <div>
+    <>
       <div className="flex justify-center">
         <div className="w-[550px] flex justify-center h-16 md:h-12">
           <NavbarMain />
@@ -61,7 +54,7 @@ export default function ShortUrlHome() {
       </div>
       {isLoading ? (
         <div className="h-[330px] text-4xl flex justify-center items-center">
-          <FaSpinner className="animate-spin opacity-30" />
+          <Loader2 className="h-6 w-6 animate-spin" />
         </div>
       ) : (
         <div className="flex flex-col items-center gap-5">
@@ -69,6 +62,6 @@ export default function ShortUrlHome() {
           <UrlsList />
         </div>
       )}
-    </div>
+    </>
   );
 }
