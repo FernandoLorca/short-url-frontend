@@ -14,6 +14,7 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
     urlShort: string | null,
     customLink: string | null
   ): string => {
+    console.log(customLink);
     const url = urlShort?.slice(0, -10);
     return `${url}${customLink}`;
   };
@@ -47,7 +48,7 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
             target="_blank"
             className="hover:underline font-bold text-sky-400"
           >
-            {url.customLink === null
+            {url.customLink
               ? url.short
               : customLinkReplace(url.short, url.customLink)}
           </Link>

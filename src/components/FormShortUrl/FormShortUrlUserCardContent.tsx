@@ -1,6 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
+import { urls } from '@/api/urls';
+import { authStatesStore } from '@/store/authStatesStore';
+import { userUrlsStatesStore } from '@/store/userUrlsStatesStore';
 import { CardContent, CardFooter } from '@/components/ui/card';
 import {
   Form,
@@ -32,6 +35,16 @@ const formSchema = z
   );
 
 export default function FormShortUrlUserCardContent() {
+  const token = authStatesStore.useAuthStore(state => state.token);
+  const setToken = authStatesStore.useAuthStore(state => state.setToken);
+  const isAuth = authStatesStore.useAuthStore(state => state.isAuth);
+  const setIsAuth = authStatesStore.useAuthStore(state => state.setIsAuth);
+  const setUser = userUrlsStatesStore.useUserUrlsStateStore(
+    state => state.setUser
+  );
+  const setUserUrl = userUrlsStatesStore.useUserUrlsStateStore(
+    state => state.setUrl
+  );
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,8 +54,16 @@ export default function FormShortUrlUserCardContent() {
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const { url, customLink } = values;
+
     try {
-      // await shortUrl(values.url, values.customLink);
+      const data = await urls.shorUrl(token, url, customLink);
+      data.user && setToken(data.user.token);
+      isAuth || setIsAuth(true);
+      data.user && setUser(data.user);
+      data.url && setUserUrl(data.urls);
+
+      console.log(data);
     } catch (error) {
       console.error(error);
     }

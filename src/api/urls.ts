@@ -16,4 +16,28 @@ const getUrls = async (token: string | null): Promise<IApiResponses> => {
   return data;
 };
 
-export const urls = { getUrls };
+const shorUrl = async (
+  token: string | null,
+  url: string,
+  customLink: string | undefined
+) => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_SHORT_URL}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        url,
+        customLink,
+      }),
+    }
+  );
+  const data = await res.json();
+
+  return data;
+};
+
+export const urls = { getUrls, shorUrl };

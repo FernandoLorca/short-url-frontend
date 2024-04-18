@@ -60,16 +60,6 @@ export default function UrlsList() {
             </div>
           ))
         )}
-        {/*userUrls?.length &&
-          userUrls?.length > 1 &&
-          userUrls.map((url, i) => (
-            <div key={url.id}>
-              <Url
-                url={url}
-                index={i}
-              />
-            </div>
-          ))*/}
       </CardContent>
     </Card>
   );

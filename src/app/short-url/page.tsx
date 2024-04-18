@@ -1,9 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+<<<<<<< Updated upstream
 import { loadingStatesStore } from '@/store/loadingStatesStore';
 import { auth } from '@/api/auth';
 import { Loader2 } from 'lucide-react';
+=======
+import { useAuthGlobalStatesStore } from '@/components/hooks/useAuthGlobalStates';
+>>>>>>> Stashed changes
 import FormShortUrlUser from '@/components/FormShortUrl/FormShortUrlUser';
 import NavbarMain from '@/components/Navbar/NavbarMain';
 import UrlsList from '@/components/UrlsList/UrlsList';
