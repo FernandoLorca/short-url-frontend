@@ -23,9 +23,15 @@ export default function UrlsList() {
       setIsLoading(true);
       if (token) {
         const getUserUrls = await urls.getUrls(token);
-
-        if (getUserUrls.urls) setUserUrls(getUserUrls.urls);
-        if (getUserUrls.user && getUserUrls.user.token)
+        if (
+          !getUserUrls?.ok &&
+          getUserUrls?.status === 404 &&
+          getUserUrls?.message === 'Found no link from this user.'
+        ) {
+          setUserUrls(undefined);
+        }
+        if (getUserUrls?.urls) setUserUrls(getUserUrls.urls);
+        if (getUserUrls?.user && getUserUrls.user.token)
           setToken(getUserUrls.user.token);
       }
       setIsLoading(false);
@@ -37,7 +43,7 @@ export default function UrlsList() {
   useEffect(() => {
     getLinks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [token]);
   return (
     <Card className="w-[550px] mb-10">
       <CardHeader>
@@ -48,9 +54,10 @@ export default function UrlsList() {
           <div className="flex justify-center">
             <Loader2 className="h-6 w-6 animate-spin" />
           </div>
-        ) : (
-          userUrls?.length &&
-          userUrls?.length > 1 &&
+        ) : userUrls?.length &&
+          userUrls?.length >= 1 &&
+          userUrls[0].id !== 0 &&
+          userUrls !== undefined ? (
           userUrls.map((url, i) => (
             <div key={url.id}>
               <Url
@@ -59,6 +66,8 @@ export default function UrlsList() {
               />
             </div>
           ))
+        ) : (
+          <p>You don&apos;t have registered links.</p>
         )}
       </CardContent>
     </Card>

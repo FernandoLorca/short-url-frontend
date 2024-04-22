@@ -60,7 +60,6 @@ export default function FormSignIn() {
     setIsLoading(true);
     try {
       const resUser = await auth.logUser(values.email, values.password);
-
       if (
         !resUser.ok &&
         resUser.status === 400 &&
@@ -90,16 +89,13 @@ export default function FormSignIn() {
           message: resUser.message,
         });
       }
-
       if (resUser.user) {
         setUser(resUser.user);
       }
-
       if (resUser.user && resUser.user.token) {
         setToken(resUser.user.token);
         setIsAuth(true);
       }
-
       if (
         resUser.ok &&
         resUser.status === 200 &&

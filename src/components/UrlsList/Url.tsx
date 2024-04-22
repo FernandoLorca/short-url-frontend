@@ -1,8 +1,8 @@
-import { MdModeEdit } from 'react-icons/md';
-import { BiTrashAlt } from 'react-icons/bi';
 import Link from 'next/link';
 import { userUrlsStatesStore } from '@/store/userUrlsStatesStore';
 import { Separator } from '@/components/ui/separator';
+import UrlEdit from './UrlEdit';
+import UrlRemove from './UrlRemove';
 import { Url as UrlType } from '@/types';
 
 export default function Url({ url, index }: { url: UrlType; index: number }) {
@@ -14,7 +14,6 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
     urlShort: string | null,
     customLink: string | null
   ): string => {
-    console.log(customLink);
     const url = urlShort?.slice(0, -10);
     return `${url}${customLink}`;
   };
@@ -34,12 +33,8 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
             {url.customLink}
           </h4>
           <div className="flex gap-2">
-            <div className="cursor-pointer hover:opacity-75">
-              <MdModeEdit />
-            </div>
-            <div className="cursor-pointer hover:opacity-75">
-              <BiTrashAlt />
-            </div>
+            <UrlEdit />
+            <UrlRemove url={url} />
           </div>
         </div>
         <div className="inline-block">
@@ -48,7 +43,7 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
             target="_blank"
             className="hover:underline font-bold text-sky-400"
           >
-            {url.customLink
+            {!url.customLink
               ? url.short
               : customLinkReplace(url.short, url.customLink)}
           </Link>

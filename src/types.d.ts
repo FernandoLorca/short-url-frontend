@@ -17,5 +17,5 @@ export interface IApiResponses {
   status: number;
   message: string;
   user?: User;
-  urls?: Url[];
+  urls?: Url[] | undefined;
 }

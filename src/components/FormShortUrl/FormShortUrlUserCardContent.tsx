@@ -15,6 +15,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
 
 const formSchema = z
   .object({
@@ -35,6 +37,7 @@ const formSchema = z
   );
 
 export default function FormShortUrlUserCardContent() {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const token = authStatesStore.useAuthStore(state => state.token);
   const setToken = authStatesStore.useAuthStore(state => state.setToken);
   const isAuth = authStatesStore.useAuthStore(state => state.isAuth);
@@ -55,17 +58,19 @@ export default function FormShortUrlUserCardContent() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const { url, customLink } = values;
+    setIsLoading(true);
 
     try {
       const data = await urls.shorUrl(token, url, customLink);
-      data.user && setToken(data.user.token);
+      data?.user && setUser(data.user);
+      data?.user && setToken(data.user.token);
       isAuth || setIsAuth(true);
-      data.user && setUser(data.user);
-      data.url && setUserUrl(data.urls);
-
-      console.log(data);
+      data?.urls && setUserUrl(data.urls);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
+      form.reset();
     }
   };
 
@@ -115,12 +120,22 @@ export default function FormShortUrlUserCardContent() {
             )}
           />
           <CardFooter className="flex flex-col items-center gap-2 p-0">
-            <Button
-              className="w-full"
-              type="submit"
-            >
-              Short Url
-            </Button>
+            {!isLoading ? (
+              <Button
+                className="w-full"
+                type="submit"
+              >
+                Short Url
+              </Button>
+            ) : (
+              <Button
+                disabled
+                className="w-full"
+              >
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Please wait
+              </Button>
+            )}
           </CardFooter>
         </form>
       </Form>

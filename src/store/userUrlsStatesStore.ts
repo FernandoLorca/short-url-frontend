@@ -3,7 +3,7 @@ import { IApiResponses, User, Url } from '@/types';
 
 interface SetUserAndUrl extends IApiResponses {
   setUser: (user: User) => void;
-  setUrl: (url: Url[]) => void;
+  setUrl: (url: Url[] | undefined) => void;
 }
 
 const useUserUrlsStateStore = create<SetUserAndUrl>(set => ({
