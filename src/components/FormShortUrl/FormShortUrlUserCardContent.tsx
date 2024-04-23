@@ -24,7 +24,9 @@ const formSchema = z
       .string()
       .min(7, { message: 'Url must contain at least 7 characters' })
       .max(100),
-    customLink: z.string().optional(),
+    customLink: z.string().min(5).max(40, {
+      message: 'Custom link must have between 5 and 40 characters',
+    }),
   })
   .refine(
     data => {
@@ -62,6 +64,8 @@ export default function FormShortUrlUserCardContent() {
 
     try {
       const data = await urls.shorUrl(token, url, customLink);
+      console.log(data);
+
       data?.user && setUser(data.user);
       data?.user && setToken(data.user.token);
       isAuth || setIsAuth(true);
