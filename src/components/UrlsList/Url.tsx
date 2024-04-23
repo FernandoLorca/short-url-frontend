@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
@@ -14,19 +15,28 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Button } from '../ui/button';
+import { MdCheck } from 'react-icons/md';
 import Link from 'next/link';
 import UrlEdit from './UrlEdit';
 import UrlRemove from './UrlRemove';
 import { Url as UrlType } from '@/types';
+import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
   customLink: z.string(),
 });
 
 export default function Url({ url, index }: { url: UrlType; index: number }) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const token = authStatesStore.useAuthStore(state => state.token);
+  const setToken = authStatesStore.useAuthStore(state => state.setToken);
   const isUpdating = isUpdatingStore.useIsUpdating(state => state.isUpdating);
+  const setIsUpdating = isUpdatingStore.useIsUpdating(
+    state => state.setIsUpdating
+  );
   const urlId = isUpdatingStore.useIsUpdating(state => state.urlId);
+  const setUrlId = isUpdatingStore.useIsUpdating(state => state.setUrlId);
   const userUrls = userUrlsStatesStore.useUserUrlsStateStore(
     state => state.urls
   );
@@ -48,17 +58,23 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      customLink: '',
+      customLink: url.customLink || '',
     },
   });
 
   const updateUrl = async (
     values: z.infer<typeof formSchema>
   ): Promise<void> => {
+    setIsLoading(true);
     try {
-      const data = await urls.updateUrl(token, url.id, url.customLink);
+      const data = await urls.updateUrl(token, url.id, values.customLink);
+      data?.user && setToken(data.user.token);
+      setIsUpdating(false);
+      setUrlId(null);
     } catch (error) {
       console.error(error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,25 +90,36 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
                   onSubmit={form.handleSubmit(updateUrl)}
                   className="space-y-8 w-full"
                 >
-                  <FormField
-                    control={form.control}
-                    name="customLink"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <>
-                            <Input
-                              id="customLink"
-                              placeholder="Custom link"
-                              className="w-full"
-                              {...field}
-                            />
-                          </>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
+                  <div className="flex gap-2">
+                    <FormField
+                      control={form.control}
+                      name="customLink"
+                      render={({ field }) => (
+                        <FormItem className="grow">
+                          <FormControl>
+                            <>
+                              <Input
+                                id="customLink"
+                                placeholder="Custom link"
+                                className="w-full"
+                                {...field}
+                              />
+                            </>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {!isLoading ? (
+                      <Button type="submit">
+                        <MdCheck className="cursor-pointer hover:opacity-75" />
+                      </Button>
+                    ) : (
+                      <Button type="submit">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </Button>
                     )}
-                  />
+                  </div>
                 </form>
               </Form>
             ) : (
