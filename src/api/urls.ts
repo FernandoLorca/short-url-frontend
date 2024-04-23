@@ -50,6 +50,34 @@ const shorUrl = async (
   }
 };
 
+const updateUrl = async (
+  token: string | null,
+  urlId: number,
+  customLink: string | null
+): Promise<IApiResponses | undefined> => {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}${process.env.NEXT_PUBLIC_UPDATE_URL}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          urlId,
+          customLink,
+        }),
+      }
+    );
+    const data = await res.json();
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 const deleteUrl = async (
   token: string | null,
   id: number
@@ -76,4 +104,4 @@ const deleteUrl = async (
   }
 };
 
-export const urls = { getUrls, shorUrl, deleteUrl };
+export const urls = { getUrls, shorUrl, deleteUrl, updateUrl };

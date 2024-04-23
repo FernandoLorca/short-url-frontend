@@ -3,16 +3,13 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/api/auth';
 import { Loader2 } from 'lucide-react';
-import { loadingStatesStore } from '@/store/loadingStatesStore';
+import { userUrlsStatesStore } from '@/store/userUrlsStatesStore';
 import FormShortUrlUser from '@/components/FormShortUrl/FormShortUrlUser';
 import NavbarMain from '@/components/Navbar/NavbarMain';
 import UrlsList from '@/components/UrlsList/UrlsList';
 
 export default function ShortUrlHome() {
   const router = useRouter();
-  const globalIsLoading = loadingStatesStore.useIsLoading(
-    state => state.setIsLoading
-  );
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   let token: string | null = null;

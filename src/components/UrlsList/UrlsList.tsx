@@ -59,12 +59,14 @@ export default function UrlsList() {
           userUrls[0].id !== 0 &&
           userUrls !== undefined ? (
           userUrls.map((url, i) => (
-            <div key={url.id}>
-              <Url
-                url={url}
-                index={i}
-              />
-            </div>
+            <ul key={url.id}>
+              <li>
+                <Url
+                  url={url}
+                  index={i}
+                />
+              </li>
+            </ul>
           ))
         ) : (
           <p>You don&apos;t have registered links.</p>

@@ -11,7 +11,6 @@ export default function UrlRemove({ url }: { url: Url }) {
   const setToken = authStatesStore.useAuthStore(state => state.setToken);
 
   const deleteUrl = async () => {
-    console.log('Event prevented:', event?.defaultPrevented);
     setIsLoading(true);
     try {
       const urlDeleted = await urls.deleteUrl(token, url.id);
