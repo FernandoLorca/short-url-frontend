@@ -24,7 +24,10 @@ import { Url as UrlType } from '@/types';
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
-  customLink: z.string(),
+  customLink: z
+    .string()
+    .min(5)
+    .max(40, { message: 'Custom link must be between 5 and 40 characters' }),
 });
 
 export default function Url({ url, index }: { url: UrlType; index: number }) {
@@ -68,6 +71,20 @@ export default function Url({ url, index }: { url: UrlType; index: number }) {
     setIsLoading(true);
     try {
       const data = await urls.updateUrl(token, url.id, values.customLink);
+      console.log(data);
+
+      if (
+        !data?.ok &&
+        data?.status === 400 &&
+        data?.message === 'Custom link already have that value'
+      ) {
+        form.setError('customLink', {
+          type: 'custom',
+          message: 'Custom link already exists',
+        });
+        return;
+      }
+
       data?.user && setToken(data.user.token);
       setIsUpdating(false);
       setUrlId(null);
