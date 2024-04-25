@@ -19,9 +19,6 @@ export default function UserDropdownMenu() {
         <FaUser />
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>
-          <Link href="/short-url">Profile</Link>
-        </DropdownMenuItem>
         <DropdownMenuItem className="cursor-pointer">
           <Link href="/short-url">URLs</Link>
         </DropdownMenuItem>

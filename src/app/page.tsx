@@ -10,20 +10,25 @@ import FormShortUrlHome from '@/components/FormShortUrl/FormShortUrlHome';
 import NavbarMain from '@/components/Navbar/NavbarMain';
 
 export default function Home() {
+  const router = useRouter();
   authStatesStore.useAuthStore(state => state.token);
   const isLoading = loadingStatesStore.useIsLoading(state => state.isLoading);
   const setIsLoading = loadingStatesStore.useIsLoading(
     state => state.setIsLoading
   );
-  const getTokenFromLocalStorage = localStorage.getItem('auth');
-  const token =
-    getTokenFromLocalStorage && JSON.parse(getTokenFromLocalStorage);
-  const router = useRouter();
+
+  let token: string | null = null;
+  if (typeof window !== 'undefined') {
+    const getTokenFromLocalStorage = localStorage.getItem('auth');
+    const tokenParseFromLocalStorage =
+      getTokenFromLocalStorage && JSON.parse(getTokenFromLocalStorage);
+    token = tokenParseFromLocalStorage.state.token;
+  }
 
   const tokenValidation = async () => {
     setIsLoading(true);
     try {
-      const isValidToken = await auth.validateToken(token?.state.token);
+      const isValidToken = await auth.validateToken(token);
 
       if (isValidToken) {
         router.push('/short-url');

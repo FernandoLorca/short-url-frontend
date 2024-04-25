@@ -16,12 +16,9 @@ export default function AuthDropdownMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuItem className="cursor-pointer">
-          <Link href="/">Home</Link>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem className="cursor-pointer">
           <Link href="/sign-in">Sign in</Link>
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem className="cursor-pointer">
           <Link href="/sign-up">Sign up</Link>
         </DropdownMenuItem>

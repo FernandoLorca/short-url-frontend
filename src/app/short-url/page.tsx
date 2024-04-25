@@ -15,9 +15,9 @@ export default function ShortUrlHome() {
   let token: string | null = null;
   if (typeof window !== 'undefined') {
     const getTokenFromLocalStorage = localStorage.getItem('auth');
-    const tokenPargeFromLocalStorage =
+    const tokenParseFromLocalStorage =
       getTokenFromLocalStorage && JSON.parse(getTokenFromLocalStorage);
-    token = tokenPargeFromLocalStorage.state.token;
+    token = tokenParseFromLocalStorage.state.token;
   }
 
   const tokenValidation = async () => {
