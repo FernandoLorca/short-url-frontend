@@ -9,7 +9,7 @@ export default function FormShortUrlUser() {
   const [isMinimize, setIsMinimize] = useState<boolean>(false);
 
   return (
-    <Card className="w-[550px] mt-10">
+    <Card className="max-w-[550px] mt-10 w-full">
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>URL shorterer</CardTitle>

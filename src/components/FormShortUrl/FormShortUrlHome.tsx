@@ -84,7 +84,7 @@ export default function FormShortUrlHome() {
   };
   return (
     <div className="mt-10 flex justify-center">
-      <Card className="w-[550px]">
+      <Card className="max-w-[550px] w-full">
         <CardHeader>
           <CardTitle>Shorten your URL</CardTitle>
         </CardHeader>

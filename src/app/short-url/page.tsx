@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/api/auth';
 import { Loader2 } from 'lucide-react';
-import { userUrlsStatesStore } from '@/store/userUrlsStatesStore';
 import FormShortUrlUser from '@/components/FormShortUrl/FormShortUrlUser';
 import NavbarMain from '@/components/Navbar/NavbarMain';
 import UrlsList from '@/components/UrlsList/UrlsList';

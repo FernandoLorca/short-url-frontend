@@ -45,7 +45,7 @@ export default function UrlsList() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
   return (
-    <Card className="w-[550px] mb-10">
+    <Card className="max-w-[550px] mb-10 w-full">
       <CardHeader>
         <CardTitle>My URLs</CardTitle>
       </CardHeader>
