@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { custom, z } from 'zod';
+import { z } from 'zod';
 import { useForm } from 'react-hook-form';
 import { urls } from '@/api/urls';
 import { authStatesStore } from '@/store/authStatesStore';
@@ -19,8 +19,8 @@ import { Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type CustomLinkError = {
-  error: string | null;
-  inputValue: string | undefined;
+  error: string | null | undefined;
+  inputValue: string | null | undefined;
 };
 
 const formSchema = z
@@ -31,9 +31,13 @@ const formSchema = z
       .max(100),
     customLink: z
       .string()
-      .min(5)
-      .max(40, {
-        message: 'Custom link must have between 5 and 40 characters',
+      .refine(value => !value || value.length >= 5, {
+        message: 'Custom link must have at least 5 characters',
+        path: ['customLink'],
+      })
+      .refine(value => !value || value.length <= 40, {
+        message: 'Custom link must have at most 40 characters',
+        path: ['customLink'],
       })
       .optional(),
   })
@@ -52,6 +56,7 @@ export default function FormShortUrlUserCardContent() {
     error: null,
     inputValue: '',
   });
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const token = authStatesStore.useAuthStore(state => state.token);
   const setToken = authStatesStore.useAuthStore(state => state.setToken);
@@ -69,19 +74,26 @@ export default function FormShortUrlUserCardContent() {
     defaultValues: {
       url: '',
       customLink:
-        customLinkError.error === null ? '' : customLinkError.inputValue,
+        customLinkError.error === null
+          ? ''
+          : customLinkError.inputValue || undefined,
     },
   });
 
   useEffect(() => {
-    if (!customLinkError.error) {
-      form.setError('customLink', {
-        type: 'custom',
-        message: 'Custom link already exists',
+    if (form.formState.errors.customLink) {
+      setCustomLinkError({
+        error: form.formState.errors.customLink.message,
+        inputValue: form.getValues().customLink,
+      });
+    } else {
+      setCustomLinkError({
+        error: null,
+        inputValue: '',
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customLinkError]);
+  }, [form.formState.errors.customLink, form.getValues().customLink]);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const { url, customLink } = values;
